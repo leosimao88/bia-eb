@@ -20,7 +20,6 @@ module.exports = () => {
   app.use(cors());
 
   require("../api/routes/tarefas")(app);
-  require("../api/routes/versao")(app);
 
   // Fallback para React Router - serve index.html para todas as rotas não-API
   app.get('*', (req, res) => {

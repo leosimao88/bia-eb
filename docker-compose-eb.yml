@@ -1,10 +1,11 @@
-version: "3"
 services:
   server:
-    image: SEU_REPOSITORIO/bia:${TAG}
+    image: 322095785990.dkr.ecr.us-east-1.amazonaws.com/bia-beanstalk:${TAG}
     ports:
       - 80:8080
     environment:
-      DB_USER: postgres
-      DB_PWD: postgres
-      DB_PORT: 5432
+      DB_SECRET_NAME: ${DB_SECRET_NAME}
+      DB_REGION: ${DB_REGION}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}

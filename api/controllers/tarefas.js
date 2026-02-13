@@ -1,87 +1,91 @@
-const { Tarefas } = require("../models");
+const db = require("../models");
 
 module.exports = () => {
   const controller = {};
 
-  controller.create = (req, res) => {
-    let tarefa = {
-      titulo: req.body.titulo,
-      dia_atividade: req.body.dia,
-      importante: req.body.importante,
-    };
+  controller.create = async (req, res) => {
+    try {
+      await db.ready;
+      const { Tarefas } = db;
+      let tarefa = {
+        titulo: req.body.titulo,
+        dia_atividade: req.body.dia,
+        importante: req.body.importante,
+      };
 
-    Tarefas.create(tarefa)
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: err.message || "Deu ruim.",
-        });
+      const data = await Tarefas.create(tarefa);
+      res.send(data);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Deu ruim.",
       });
+    }
   };
 
-  controller.find = (req, res) => {
-    let uuid = req.params.uuid;
-    Tarefas.findByPk(uuid)
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: err.message || "Deu ruim.",
-        });
+  controller.find = async (req, res) => {
+    try {
+      await db.ready;
+      const { Tarefas } = db;
+      let uuid = req.params.uuid;
+      const data = await Tarefas.findByPk(uuid);
+      res.send(data);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Deu ruim.",
       });
+    }
   };
 
-  controller.delete = (req, res) => {
-    let { uuid } = req.params;
+  controller.delete = async (req, res) => {
+    try {
+      await db.ready;
+      const { Tarefas } = db;
+      let { uuid } = req.params;
 
-    Tarefas.destroy({
-      where: {
-        uuid: uuid,
-      },
-    })
-      .then(() => {
-        res.send();
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: err.message || "Deu ruim.",
-        });
+      await Tarefas.destroy({
+        where: {
+          uuid: uuid,
+        },
       });
+      res.send();
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Deu ruim.",
+      });
+    }
   };
 
-  controller.update_priority = (req, res) => {
-    let { uuid } = req.params;
+  controller.update_priority = async (req, res) => {
+    try {
+      await db.ready;
+      const { Tarefas } = db;
+      let { uuid } = req.params;
 
-    Tarefas.update(req.body, {
-      where: {
-        uuid: uuid,
-      },
-    })
-      .then(() => {
-        Tarefas.findByPk(uuid).then((data) => {
-          res.send(data);
-        });
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: err.message || "Deu ruim.",
-        });
+      await Tarefas.update(req.body, {
+        where: {
+          uuid: uuid,
+        },
       });
+      const data = await Tarefas.findByPk(uuid);
+      res.send(data);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Deu ruim.",
+      });
+    }
   };
 
-  controller.findAll = (req, res) => {
-    Tarefas.findAll()
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: err.message || "Deu ruim.",
-        });
+  controller.findAll = async (req, res) => {
+    try {
+      await db.ready;
+      const { Tarefas } = db;
+      const data = await Tarefas.findAll();
+      res.send(data);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Deu ruim.",
       });
+    }
   };
   return controller;
 };

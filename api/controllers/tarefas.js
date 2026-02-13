@@ -5,15 +5,14 @@ module.exports = () => {
 
   controller.create = async (req, res) => {
     try {
-      await db.ready;
-      const { Tarefas } = db;
+      await db.initialize();
       let tarefa = {
         titulo: req.body.titulo,
         dia_atividade: req.body.dia,
         importante: req.body.importante,
       };
 
-      const data = await Tarefas.create(tarefa);
+      const data = await db.Tarefas.create(tarefa);
       res.send(data);
     } catch (err) {
       res.status(500).send({
@@ -24,10 +23,9 @@ module.exports = () => {
 
   controller.find = async (req, res) => {
     try {
-      await db.ready;
-      const { Tarefas } = db;
+      await db.initialize();
       let uuid = req.params.uuid;
-      const data = await Tarefas.findByPk(uuid);
+      const data = await db.Tarefas.findByPk(uuid);
       res.send(data);
     } catch (err) {
       res.status(500).send({
@@ -38,11 +36,10 @@ module.exports = () => {
 
   controller.delete = async (req, res) => {
     try {
-      await db.ready;
-      const { Tarefas } = db;
+      await db.initialize();
       let { uuid } = req.params;
 
-      await Tarefas.destroy({
+      await db.Tarefas.destroy({
         where: {
           uuid: uuid,
         },
@@ -57,16 +54,15 @@ module.exports = () => {
 
   controller.update_priority = async (req, res) => {
     try {
-      await db.ready;
-      const { Tarefas } = db;
+      await db.initialize();
       let { uuid } = req.params;
 
-      await Tarefas.update(req.body, {
+      await db.Tarefas.update(req.body, {
         where: {
           uuid: uuid,
         },
       });
-      const data = await Tarefas.findByPk(uuid);
+      const data = await db.Tarefas.findByPk(uuid);
       res.send(data);
     } catch (err) {
       res.status(500).send({
@@ -77,9 +73,8 @@ module.exports = () => {
 
   controller.findAll = async (req, res) => {
     try {
-      await db.ready;
-      const { Tarefas } = db;
-      const data = await Tarefas.findAll();
+      await db.initialize();
+      const data = await db.Tarefas.findAll();
       res.send(data);
     } catch (err) {
       res.status(500).send({

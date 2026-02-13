@@ -6,18 +6,15 @@ const Sequelize = require("sequelize");
 const basename = path.basename(__filename);
 const getConfig = require("../../config/database.js");
 
-const db = {};
+let db = {};
+let initialized = false;
 
-// Função assíncrona para inicializar o Sequelize
-async function initializeSequelize() {
+async function initialize() {
+  if (initialized) return db;
+  
   const config = await getConfig();
-  return new Sequelize(config);
-}
+  const sequelize = new Sequelize(config);
 
-// Inicializar e exportar
-const sequelizePromise = initializeSequelize();
-
-sequelizePromise.then((sequelize) => {
   fs.readdirSync(__dirname)
     .filter((file) => {
       return (
@@ -40,8 +37,17 @@ sequelizePromise.then((sequelize) => {
 
   db.sequelize = sequelize;
   db.Sequelize = Sequelize;
+  initialized = true;
+  
+  return db;
+}
+
+module.exports = new Proxy({}, {
+  get: (target, prop) => {
+    if (prop === 'initialize') return initialize;
+    if (!initialized) {
+      throw new Error('Database not initialized. Call initialize() first.');
+    }
+    return db[prop];
+  }
 });
-
-db.ready = sequelizePromise.then(() => db);
-
-module.exports = db;

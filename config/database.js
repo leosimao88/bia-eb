@@ -34,22 +34,27 @@ async function getConfig(){
   };
 
   if(process.env.DB_SECRET_NAME && process.env.DB_SECRET_NAME.trim() !== '' ){
-    console.log('Usando Secrets Manager para credenciais do banco');
+    console.log('🔐 Carregando credenciais do AWS Secrets Manager...');
+    console.log('   Secret Name:', process.env.DB_SECRET_NAME);
+    console.log('   Region:', process.env.DB_REGION);
+    
     const secretsManagerClient = await createSecretsManagerClient();
     const secrets = await getSecrets(secretsManagerClient);
 
     if(secrets){
       dbConfig.username = secrets.username;
       dbConfig.password = secrets.password;
-      console.log('Credenciais carregadas do Secrets Manager com sucesso');
+      console.log('✅ Credenciais carregadas do Secrets Manager');
+      console.log('   Username:', secrets.username);
+      console.log('   Password: ****' + secrets.password.slice(-4));
       await imprimirSecrets(secrets);
     }
   } else if(process.env.DB_USER && process.env.DB_PWD) {
-    console.log('Usando credenciais das variáveis de ambiente');
+    console.log('⚠️  Usando credenciais das variáveis de ambiente');
     dbConfig.username = process.env.DB_USER;
     dbConfig.password = process.env.DB_PWD;
   } else {
-    console.log('Usando credenciais padrão (desenvolvimento local)');
+    console.log('🏠 Usando credenciais padrão (desenvolvimento local)');
   }
   
   return dbConfig;
